@@ -1,67 +1,52 @@
-WHAT the app will look like.
+AUTHOR: William Stein, April 2012
 
- 1. Visit the page and authenticate using openid.
+This is a very simple test implementation of an idea for how to create
+the Sage Workspace Server to see if it has any legs.  Key to the idea
+is that the implementation is very plugable and iterative, so this is
+a good place to begin.  The following is thus the simplest imaginable
+version of the architecture.  My plan is to make a version of this
+with no shortcuts or ugly code that is fully documented.
 
- 2. You see two CodeMirror2 boxes with something like this in them:
+The Data Model:
 
-    Status: Running sage process started 19 minutes ago.
+- user:
+    - name
+    - exactly one workspace
+- workspace:
+    - name
+    - file = exactly one code evaluator
+- session server:
+    - name
+    - url
 
-    [                                   ]
-    [                                   ]
-    [ sage: a = 5                       ]          (read only box, with scroll bars)
-    [ sage: b = 7                       ]
-    [ sage: factor(a^2 + b^3)           ]	   
-    [ 2^4 * 23                          ]
+The Session Server:
+- flask webserver:
+    - request a session
+         INPUT:  url
+         OUTPUT: session id
+    - submit block of code to evaluate (get back id)
+         INPUT:  session id, block of code (string)
+         OUTPUT: code id
+    - as code generates output, the session url will receive
+      POST requests containing the output so far and code id
 
-
-    [ for i in range(3):                ]          (you type this)
-    [    print a*(b+i)                  ]          (write-able box) 
-    evaluate
- 
-
- 3. Type 1 or more lines of code into the second box and click
-    evaluate (or press shift-enter).
- 
- 4. In a fraction of a second the above two boxes change to look like this:
-
-    Status: Running sage process started 20 minutes ago.
-
-    [                                   ]
-    [ sage: a = 5                       ]          (read only box)
-    [ sage: b = 7                       ]
-    [ sage: factor(a^2 + b^3)           ]	   
-    [ 2^4 * 23                          ]
-    [ sage: for i in range(3):          ]
-    [ ...       print a*(b*i)           ]
-    [*                                  ]
-
-    [                                   ]
-    [                                   ]          (write-able box) 
-    evaluate
-
- 5. In a fraction of a second more they look like this:
-
-    Status: Running sage process started 20 minutes ago.
-
-    [                                   ]
-    [ sage: a = 5                       ]          (read only box, with scroll bars)
-    [ sage: b = 7                       ]
-    [ sage: factor(a^2 + b^3)           ]	   
-    [ 2^4 * 23                          ]
-    [ sage: for i in range(3):          ]
-    [ ...       print a*(b*i)           ]
-    [ 35                                ]
-    [ 40                                ]
-    [ 45                                ]
-
-    [                                   ]
-    [                                   ]          (write-able box) 
-    evaluate
+The Sage Workspace Server:
+- gae flask webserver:
+    - user login
+    - / is: POST form to input code to evaluate in the only object in the only workspace
+    - create channel to client
+    - receive block of code to evaluate
+    - if no sage session for user, 
+    
+The User Client:
+- javascript in a client browser:
+    - submit code to evaluate
+    - put output somewhere as it is appears
 
 
-Behind the scenes there is <= 1 persistent session for each user. 
 
 
----------------------------------
+
+
 
 
